@@ -8,7 +8,7 @@ def valid_path(path: str) -> bool:
 
 
 def read_file(path: str) -> bytes:
-    for root, dirs, files in os.walk(ROOT):
+    for root, _, files in os.walk(ROOT):
         for name in files:
             current_path = os.path.join(root, name)
             print(current_path)
