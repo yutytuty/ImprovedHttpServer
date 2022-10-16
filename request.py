@@ -35,15 +35,15 @@ class RequestParamaters:
         self.body = body
 
 
-RequestParamaters.CLEAR = RequestParamaters("",
-                                            ERequestMethod.INVALID,
-                                            "",
-                                            {},
-                                            b"")
+BLANK_REQUEST = RequestParamaters("",
+                                  ERequestMethod.INVALID,
+                                  "",
+                                  {},
+                                  b"")
 
 
 class Request:
-    def __init__(self, params=RequestParamaters.CLEAR):
+    def __init__(self, params=BLANK_REQUEST):
         self._http_version = params.http_version
         self._method = params.method
         self._path = params.path
@@ -100,6 +100,7 @@ class Request:
             headers[key] = value
         self._headers = headers
         self._body = body
+        return True
 
     def is_valid(self) -> bool:
         """
@@ -108,10 +109,13 @@ class Request:
         return not (self._http_version == "" or
                     self._method == ERequestMethod.INVALID or
                     self._path == "" or
-                    valid_path(self._path))
+                    not valid_path(self._path))
 
     def get_path(self) -> str:
         return self._path
+
+    def get_method(self) -> ERequestMethod:
+        return self._method
 
     def _generate_status_line(self) -> str:
         return f"{self._method.value} {self._path} {self._http_version}"
@@ -131,4 +135,3 @@ class Request:
 
     def __bytes__(self):
         return self.__str__().encode()
-
