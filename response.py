@@ -57,7 +57,7 @@ class Response:
                 else:
                     self._status_code = 500
                     self._status_phrase = "Internal Server Error"
-                    self._body = b"Paramater Error"
+                    self._set_body_from_text("Paramater Error")
 
             elif is_valid_path(request.get_path()):
                 self._status_code = 200
