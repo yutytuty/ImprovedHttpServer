@@ -40,7 +40,7 @@ class Response:
 
         elif request.is_valid and request.get_path() in REDIRECTS.keys():
             self._status_code = 301
-            self._headers = {"Location": f"http://localhost:8888{REDIRECTS[request.get_path()]}"}
+            self._headers = {"Location": f"{request.get_host()}{REDIRECTS[request.get_path()]}"}
             self._status_phrase = "Moved Permanently"
 
         elif request.is_valid() and not is_valid_path(request.get_path()):
