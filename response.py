@@ -1,4 +1,3 @@
-import socket
 from request import Request
 from fs import is_valid_path, read_file
 
