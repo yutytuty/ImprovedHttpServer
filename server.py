@@ -14,7 +14,7 @@ class Server:
     def initialize(self):
         self._s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._s.bind((self._host, self._port))
-        self._s.listen(5) # Nothing changes if I change the number so......
+        self._s.listen(5) # Don't know what the number does and seems to not matter
         self._debug_print(f"listening on {self._host}:{self._port}")
         self._running = False
 
