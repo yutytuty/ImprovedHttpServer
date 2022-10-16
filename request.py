@@ -116,6 +116,9 @@ class Request:
     def get_method(self) -> ERequestMethod:
         return self._method
 
+    def get_host(self) -> str:
+        return self._headers['Host']
+
     def _generate_status_line(self) -> str:
         return f"{self._method.value} {self._path} {self._http_version}"
 
@@ -130,7 +133,7 @@ class Request:
             return ""
         status_line = self._generate_status_line()
         headers = self._generate_headers()
-        return status_line + headers + "\r\n" + self._body.decode() + "\r\n"
+        return status_line + "\r\n" + headers + "\r\n" + self._body.decode() + "\r\n"
 
     def __bytes__(self):
         return self.__str__().encode()
