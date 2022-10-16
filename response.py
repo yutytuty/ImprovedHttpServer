@@ -49,7 +49,7 @@ class Response:
                 _, params = request.get_path().split("?", 1)
                 params = params.split("&")
                 params = dict(param.split("=") for param in params)
-                if len(params.keys()) == 1 and 'num' in params.keys() and params['num'].isnumeric():
+                if len(params.keys()) == 1 and 'num' in params.keys() and params['num'].lstrip("-").isnumeric():
                     num = int(params['num'])
                     self._status_code = 200
                     self._status_phrase = "OK"
