@@ -1,6 +1,6 @@
 import socket
 from request import Request
-from fs import valid_path
+from fs import is_valid_path, read_file
 
 
 class ResponseParamaters:
@@ -17,11 +17,15 @@ class ResponseParamaters:
         self.body = body
 
 
-BLANK_RESPONSE = ResponseParamaters("HTTP/1.1", -1, "", {}, b"")
+BLANK_RESPONSE = ResponseParamaters("HTTP/1.1", -4, "", {}, b"")
+
+REDIRECTS = {
+    "/": "/index.html"
+}
 
 
 class Response:
-    def __init__(self, paramaters: ResponseParamaters = BLANK_RESPONSE):
+    def __init__(self, paramaters: ResponseParamaters=BLANK_RESPONSE):
         self._http_version = paramaters.http_version
         self._status_code = paramaters.status_code
         self._status_phrase = paramaters.status_phrase
@@ -29,12 +33,21 @@ class Response:
         self._body = paramaters.body
 
     def compose_response(self, request: Request):
-        print(f"{request.is_valid()}")
-        if request.is_valid() and valid_path(request.get_path()):
+        if request.is_valid() and is_valid_path(request.get_path()):
             self._status_code = 200
             self._status_phrase = "OK"
-            with open(request.get_path(), "rb") as f:
-                self._body = f.read()
+            self._body = read_file(request.get_path())
+
+        elif request.is_valid and request.get_path() in REDIRECTS.keys():
+            self._status_code = 301
+            self._headers = {"Location": f"http://localhost:8888{REDIRECTS[request.get_path()]}"}
+            self._status_phrase = "Moved Permanently"
+
+        elif request.is_valid() and not is_valid_path(request.get_path()):
+            self._status_code = 404
+            self._status_phrase = "Not Found"
+            self._body = b"Not Found"
+            print(self.encode())
 
     def _generate_status_line(self) -> str:
         return f"{self._http_version} {str(self._status_code)} {self._status_phrase}"
@@ -46,16 +59,11 @@ class Response:
         return headers
 
     def is_valid(self):
-        return not (self._http_version == "" or self._status_code < 0 or self._status_phrase == ""
-                    or self._headers == {} or self._body == b"")
+        return not (self._http_version == "" or self._status_code < 0 or self._status_phrase == "")
 
-    def __str__(self) -> str:
-        if not self.is_valid():
-            return ""
+    def encode(self):
         status_line = self._generate_status_line()
         headers = self._generate_headers()
-        body = self._body.decode()
-        return f"{status_line}\r\n{headers}\r\n{body}"
-
-    def __bytes__(self):
-        return self.__str__().encode()
+        body = self._body
+        resp = status_line.encode() + b"\r\n" + str(headers).encode() + b"\r\n" + body
+        return resp
