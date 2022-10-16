@@ -1,5 +1,5 @@
 from enum import Enum
-from fs import valid_path
+from fs import is_valid_path
 
 
 class ERequestMethod(Enum):
@@ -108,8 +108,7 @@ class Request:
         """
         return not (self._http_version == "" or
                     self._method == ERequestMethod.INVALID or
-                    self._path == "" or
-                    not valid_path(self._path))
+                    self._path == "")
 
     def get_path(self) -> str:
         return self._path
